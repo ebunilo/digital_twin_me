@@ -10,4 +10,12 @@ docker build -t digital-twin-me .
 docker run --rm -p 7860:7860 --env-file .env digital-twin-me
 ```
 
+Or with Compose (recommended on the server):
+
+```bash
+docker compose up -d --build
+```
+
+Optional: set `GRADIO_PUBLISH_PORT` in `.env` or the shell to change the host port (defaults to `7860`).
+
 Ensure `me/linkedin.pdf` and `me/summary.txt` exist on the host before build (they are copied into the image).
