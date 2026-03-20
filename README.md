@@ -1,6 +1,6 @@
-# digital_twin_me
+# My Digital Twin
 
-A small **Gradio** chat app that uses **OpenAI** function calling to role-play a fixed persona (“digital twin”) using a text summary and LinkedIn PDF as context. Optional **Discord** notifications record lead capture and unanswered questions.
+A small **Gradio** chat app that uses **OpenAI** function calling to role-play a “digital twin” from **YAML profile documents** under `me/`. **Pushover** delivers notifications when someone leaves contact details or asks something the profile does not cover.
 
 ---
 
@@ -10,138 +10,119 @@ The program lives in [`app.py`](app.py). This section describes how it behaves e
 
 ### Purpose
 
-Visitors chat in a browser. The model answers as a named person (currently **Calistus Igwilo**, set in code in `Me.__init__`) using:
+Visitors chat in a browser. The model answers as the person described in your profile data:
 
-- A long-form **summary** from `me/summary.txt`
-- **LinkedIn profile text** extracted from `me/linkedin.pdf` via PyPDF
+- **Display name** comes from the YAML file whose root has `document_type: profile_summary` and a `name` field (e.g. [`me/profile_summary.yml`](me/profile_summary.yml)). If none is found, the app falls back to the string **`this person`**.
+- **Context** is built from **every** `*.yml` / `*.yaml` file in `me/`: each file is loaded with `yaml.safe_load`, then dumped back as readable YAML text and concatenated into a single “structured profile documents” block in the system prompt.
 
-The assistant is instructed to stay in character, sound professional, nudge people toward email contact, and use tools when appropriate.
+There is **no PDF or plain-text summary file** in the current pipeline—the profile is entirely YAML on disk.
+
+The assistant is told to treat those documents as the **sole source of truth**, stay in character, nudge toward email when it fits, and follow strict rules around **`record_unknown_question`** when an answer is not in the docs.
 
 ### Stack
 
 | Piece | Role |
 |--------|------|
-| [Gradio](https://www.gradio.app/) | `gr.ChatInterface` with `type="messages"` — chat UI and HTTP server |
-| [OpenAI API](https://platform.openai.com/docs) | `OpenAI()` client; chat completions with **tools** |
+| [Gradio](https://www.gradio.app/) | `gr.ChatInterface(me.chat)` — chat UI and HTTP server |
+| [OpenAI API](https://platform.openai.com/docs) | `OpenAI()` client; chat completions with **tools** (`parallel_tool_calls=False`) |
 | [python-dotenv](https://pypi.org/project/python-dotenv/) | Loads `.env` at startup (`load_dotenv(override=True)`) |
-| [requests](https://requests.readthedocs.io/) | `POST` to Discord webhook when tools run |
-| [pypdf](https://pypdf.readthedocs.io/) | Reads `me/linkedin.pdf` and concatenates per-page text |
+| [PyYAML](https://pyyaml.org/) | Loads and re-serializes profile files under `me/` |
+| [requests](https://requests.readthedocs.io/) | `POST` to **Pushover** when tools run |
 
 ### Startup and data loading
 
 1. Environment variables are loaded from `.env`.
-2. If `DISCORD_WEBHOOK_URL` is set, a short log line confirms it; otherwise the app logs that it was not found.
-3. When you run the module, it constructs a single `Me` instance. In `Me.__init__`:
-   - `OpenAI()` is created (expects **`OPENAI_API_KEY`** in the environment — standard SDK behavior).
-   - `me/linkedin.pdf` is read; all pages are text-extracted and concatenated into `self.linkedin`.
-   - `me/summary.txt` is read into `self.summary`.
-
-If either file is missing or unreadable, startup fails before the UI is served.
+2. Constructing `Me()` runs `_load_me_yaml_chunks(ME_DIR)` where `ME_DIR` is the `me/` folder next to `app.py`:
+   - Collects `me/*.yml` and `me/*.yaml` (sorted).
+   - Raises **`FileNotFoundError`** if there are no such files.
+   - Sets **`self.name`** from the first dict with `document_type == "profile_summary"` and a non-empty `name` string; otherwise **`this person`**.
+   - Sets **`self.structured_context`** to all files combined (each introduced by a `### filename` header), separated by horizontal rules.
 
 ### Chat flow (`Me.chat`)
 
-For each user message, Gradio passes `(message, history)` where `history` follows the **messages** format (role/content pairs).
+Gradio passes `(message, history)`. History is normalized with **`Me._history_to_messages`**: either already OpenAI-style `{"role","content"}` dicts, or legacy **`[user, assistant]`** pairs per turn.
 
-1. Build `messages`: system prompt (from `system_prompt()`), then `history`, then the new user message.
+1. Build `messages`: system prompt, prior turns, then the new user message.
 2. Loop:
-   - Call `openai.chat.completions.create` with **`gpt-4o-mini`**, `messages`, and `tools`.
-   - If `finish_reason == "tool_calls"`, execute each tool via `handle_tool_call`, append the assistant message and tool results to `messages`, and repeat.
-   - Otherwise treat the turn as finished and return `response.choices[0].message.content`.
+   - `openai.chat.completions.create` with **`gpt-4o-mini`**, `messages`, `tools`, **`parallel_tool_calls=False`**.
+   - On **`tool_calls`**, run **`handle_tool_call`** (module-level functions by name), append assistant message and tool results, repeat.
+   - Otherwise exit the loop.
+3. **Fallback:** If the model never called **`record_unknown_question`** but the final assistant text looks like “no information in the profile” (see **`_assistant_admits_missing_docs`** heuristics), the app calls **`record_unknown_question(user_question)`** once so you still get a Pushover ping.
 
-`handle_tool_call` resolves function names against **module-level** Python functions in `globals()` (same names as the tool definitions). Each result is sent back as a `tool` role message with JSON `content`.
+The return value is **`final.content`** (the last assistant message content).
 
 ### OpenAI tools (function calling)
 
-Two tools are registered:
+| Tool | Role |
+|------|------|
+| `record_user_details` | After the user shares email (and optionally name/notes) |
+| `record_unknown_question` | When the answer is not in the structured docs; the system prompt requires a tool-only turn first in that case |
 
-| Tool | When the model is told to use it | Effect |
-|------|----------------------------------|--------|
-| `record_user_details` | User gave an email / interested in contact | `email` (required), optional `name`, `notes` → Discord message via `push()` |
-| `record_unknown_question` | Model cannot answer (including trivial or off-topic) | `question` → Discord message via `push()` |
-
-Schemas match OpenAI’s function-calling JSON: `record_user_details` requires `email`; both disallow extra properties.
-
-`push()` sends `{"content": message}` as form data to `DISCORD_WEBHOOK_URL`. **Configure the webhook in production:** if tools run while `DISCORD_WEBHOOK_URL` is unset, `requests.post` would be called with `None` as the URL (avoid that by setting the variable or disabling tool paths in your fork).
+Both invoke **`push(text)`**, which posts to Pushover’s **`messages.json`** API using **`PUSHOVER_TOKEN`** and **`PUSHOVER_USER`**. Set both in `.env` if you want notifications; otherwise tool calls may hit the API with empty credentials.
 
 ### System prompt (`Me.system_prompt`)
 
-The system message tells the model it is acting as the configured name on “the website,” to use the summary and LinkedIn text, to be professional, to **record unknown questions** with `record_unknown_question`, and to **steer toward email** and use `record_user_details` when appropriate. The summary and LinkedIn body are appended as markdown-style sections.
+Instructs the model to act as **`self.name`**, use only the structured profile block as truth, follow **mandatory** `record_unknown_question` behavior when information is missing, and use **`record_user_details`** when steering toward contact by email.
 
 ### Gradio server (`if __name__ == "__main__"`)
 
-After `Me()` is constructed, the app launches:
-
 ```text
-gr.ChatInterface(me.chat, type="messages").launch(
-    server_name=...,
-    server_port=...,
-)
+gr.ChatInterface(me.chat).launch()
 ```
 
-| Variable | Default | Meaning |
-|----------|---------|---------|
-| `GRADIO_SERVER_NAME` | `0.0.0.0` | Bind address (`0.0.0.0` allows Docker/host port mapping) |
-| `GRADIO_SERVER_PORT` | `7860` | Port inside the process |
-| `CLOUD_SERVER_IP` | (empty) | If set, prints a hint: `http://<ip>:<port>/` (firewall/reverse proxy still apply) |
+Uses Gradio’s defaults for bind address and port (typically **`127.0.0.1:7860`** locally). For Docker or a cloud VM you usually need the UI to listen on all interfaces—e.g. **`launch(server_name="0.0.0.0", server_port=7860)`**—or equivalent reverse proxy setup.
 
 ### Environment variables used by `app.py`
 
 | Variable | Required | Used for |
 |----------|----------|----------|
 | `OPENAI_API_KEY` | Yes (for real API calls) | OpenAI client authentication |
-| `DISCORD_WEBHOOK_URL` | Recommended if you use tools | Incoming webhook URL for `push()` |
-| `GRADIO_SERVER_NAME` | No | Bind address |
-| `GRADIO_SERVER_PORT` | No | App listen port |
-| `CLOUD_SERVER_IP` | No | Startup URL hint only |
-
-Other keys in `.env` (e.g. Pushover) are ignored by this file unless you extend the code.
+| `PUSHOVER_TOKEN` | For Pushover notifications | Pushover application token |
+| `PUSHOVER_USER` | For Pushover notifications | Pushover user key |
 
 ### Required files (besides `app.py`)
 
 | Path | Role |
 |------|------|
-| `me/summary.txt` | Persona/context summary injected into the system prompt |
-| `me/linkedin.pdf` | LinkedIn export (or similar PDF); text is extracted for context |
-
-The `me/` directory in the repo also contains YAML profile data; **`app.py` does not load those files** — only `summary.txt` and `linkedin.pdf`.
+| `me/*.yml` / `me/*.yaml` | At least one file; together they define the twin’s context. Prefer one `profile_summary` document with `name` for the persona label. |
 
 ### Customizing the twin
 
-- **Name and framing:** change `self.name` (and any copy in `system_prompt`) in `Me`.
-- **Model:** change the `model="gpt-4o-mini"` argument in `chat`.
-- **Context sources:** adjust paths or loaders in `Me.__init__`.
+- **Name:** edit the `profile_summary` YAML (`name` / `document_type`) or change fallback logic in **`_load_me_yaml_chunks`**.
+- **Model:** change `model="gpt-4o-mini"` in **`Me.chat`**.
+- **Profile content:** add or edit YAML files under **`me/`** (loaded automatically by glob).
 
 ### Local run
 
 ```bash
 python -m venv .venv && source .venv/bin/activate  # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-# Place me/summary.txt and me/linkedin.pdf; copy .env with OPENAI_API_KEY (and optional DISCORD_WEBHOOK_URL)
+# Ensure me/*.yml exist; set OPENAI_API_KEY and optional PUSHOVER_* in .env
 python app.py
 ```
 
-Open the URL Gradio prints (by default `http://127.0.0.1:7860` when binding locally).
+Open the URL Gradio prints.
 
 ---
 
 ## Docker (cloud server)
-
-Set `CLOUD_SERVER_IP` in `.env` to your server’s public IP or hostname (used for a startup URL hint). The app listens on `0.0.0.0:7860` inside the container.
 
 ```bash
 docker build -t digital-twin-me .
 docker run --rm -p 7860:7860 --env-file .env digital-twin-me
 ```
 
-Or with Compose (recommended on the server):
+Or with Compose:
 
 ```bash
 docker compose up -d --build
 ```
 
-Optional: set `GRADIO_PUBLISH_PORT` in `.env` or the shell to change the host port (defaults to `7860`).
+The image copies the **`me/`** tree (including your YAML profile files). Ensure **`OPENAI_API_KEY`** (and Pushover keys if used) are supplied at runtime via **`--env-file`** or your orchestrator.
 
-Ensure `me/linkedin.pdf` and `me/summary.txt` exist on the host before build (they are copied into the image).
+Optional: set **`GRADIO_PUBLISH_PORT`** in `.env` for Compose host port mapping (see [`docker-compose.yml`](docker-compose.yml)).
+
+**Note:** If the app still uses Gradio’s default bind (`127.0.0.1`), port publishing from a container may not be reachable from the host until **`launch(server_name="0.0.0.0")`** is set in code or you terminate TLS/proxy in front.
 
 ---
 
@@ -159,4 +140,4 @@ Configure these in the repo’s **Settings → Secrets and variables → Actions
 | `DEPLOY_PATH` | Yes | Absolute path on the server where the app lives (e.g. `/home/ubuntu/digital_twin_me`). No trailing slash. |
 | `SSH_PORT` | No | SSH port if not `22`. |
 
-App secrets (`OPENAI_API_KEY`, etc.) stay only in the server’s `.env`, not in GitHub, unless you add a separate workflow step to manage them.
+App secrets (`OPENAI_API_KEY`, `PUSHOVER_*`, etc.) stay only in the server’s `.env`, not in GitHub, unless you add a separate workflow step to manage them.
