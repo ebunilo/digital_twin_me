@@ -1,0 +1,68 @@
+document_type: certifications
+id: certifications_001
+priority: high
+
+first_person_summary: >
+  I hold multiple industry-recognized certifications across cloud computing,
+  DevOps, and data science. These certifications reflect my commitment to
+  building secure, scalable, and cloud-native systems, as well as my foundation
+  in data-driven and AI-related disciplines.
+
+third_person_summary: >
+  Calistus Igwilo holds multiple certifications in cloud computing, DevOps,
+  and data science, demonstrating his expertise in building secure,
+  scalable, and cloud-native systems.
+
+certifications:
+
+  - name: Kubernetes and Cloud Native Associate (KCNA)
+    issuer: Cloud Native Computing Foundation
+    date: 2025-05-25
+    category: devops
+    relevance:
+      - Kubernetes
+      - Cloud Native Architecture
+      - Container Orchestration
+
+  - name: AWS Security, Identity, & Compliance
+    issuer: Amazon Web Services
+    date: 2022-05-10
+    category: cloud_security
+    relevance:
+      - IAM
+      - Security Engineering
+      - Compliance
+
+  - name: Google Cloud Certified Associate Engineer (ACE)
+    issuer: Google Cloud
+    date: 2021-03-06
+    category: cloud
+    relevance:
+      - Cloud Infrastructure
+      - Deployment
+      - Monitoring
+
+  - name: Microsoft Certified Azure Fundamentals
+    issuer: Microsoft
+    date: 2021-03-02
+    category: cloud
+    relevance:
+      - Cloud Concepts
+      - Azure Services
+      - Infrastructure
+
+  - name: Applied Data Science
+    issuer: World Quant University
+    date: 2019-12-07
+    category: ai_data
+    relevance:
+      - Data Science
+      - Statistical Analysis
+      - Machine Learning Foundations
+
+retrieval_hints:
+  - certifications
+  - kubernetes certification
+  - aws security
+  - cloud certifications
+  - data science

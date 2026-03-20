@@ -1,0 +1,31 @@
+document_type: project
+id: project_multi_agent_ai
+
+title: Multi-Agent AI Research & Automation Platform
+
+first_person_description:
+  I designed and implemented a production-grade multi-agent AI system for automated
+  research, data aggregation, and report generation. The system uses a hierarchical
+  agent architecture where a controller agent delegates tasks to specialized agents.
+
+  I integrated multiple data sources and built agents capable of reasoning,
+  tool usage, and multi-step execution. The platform was containerized and deployed
+  with scalability and reliability in mind.
+
+third_person_description:
+  Calistus designed a production-grade multi-agent AI system that automates research
+  workflows using hierarchical agent architectures and LLM orchestration.
+
+tech_stack:
+  - Python
+  - LLM APIs (GPT, Gemini)
+  - RAG pipelines
+  - Docker
+
+skills_demonstrated:
+  - AI system architecture
+  - multi-agent orchestration
+  - LLM integration
+  - distributed systems thinking
+
+priority: very_high

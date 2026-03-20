@@ -1,0 +1,29 @@
+document_type: project
+id: project_cloud_platform
+
+title: Enterprise Cloud Banking Platform (AWS + Kubernetes)
+
+first_person_description:
+  I architected a secure, enterprise-grade cloud platform using AWS and Kubernetes.
+  I designed Terraform modules for infrastructure provisioning and implemented CI/CD
+  pipelines for automated deployment.
+
+  I built a Kubernetes platform with RBAC, ingress controllers, and high availability,
+  while enforcing strong security practices such as IAM least privilege and MFA.
+
+third_person_description:
+  Calistus architected a secure AWS and Kubernetes-based platform using Infrastructure
+  as Code and automated CI/CD pipelines.
+
+tech_stack:
+  - AWS (EKS, RDS, VPC)
+  - Terraform
+  - Kubernetes
+  - GitHub Actions
+
+impact:
+  - Reduced provisioning time to < 30 minutes
+  - Enabled full environment reproducibility
+  - Improved security posture
+
+priority: very_high

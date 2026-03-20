@@ -1,0 +1,24 @@
+document_type: project
+id: project_travel_platform
+
+title: Travel Platform Backend & DevOps System
+
+first_person_description:
+  I designed and built a production-grade backend system for a travel platform,
+  including payment integration, asynchronous processing, and scalable API design.
+
+  I implemented CI/CD pipelines, containerized services with Docker, and configured
+  Nginx for secure and optimized traffic handling.
+
+third_person_description:
+  Calistus built a scalable backend and DevOps platform for a travel application,
+  integrating payments, asynchronous processing, and deployment automation.
+
+tech_stack:
+  - Django REST Framework
+  - PostgreSQL
+  - Celery & Redis
+  - Docker
+  - Nginx
+
+priority: high

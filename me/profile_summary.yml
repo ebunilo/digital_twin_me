@@ -1,0 +1,30 @@
+document_type: profile_summary
+id: profile_ultimate
+
+name: Calistus Igwilo
+email: ebunloigwilo@gmail.com
+location: Nigeria
+
+title: Senior AI, Backend & DevOps Engineer | Cloud & Platform Architect
+
+first_person_summary:
+  I am a Senior AI, Backend, and DevOps Engineer specializing in building intelligent,
+  scalable, and secure production systems. I design and deploy agentic AI platforms,
+  robust backend services, and cloud-native infrastructure using Kubernetes and AWS.
+
+  My strength lies in taking AI concepts from prototype to production by integrating
+  LLM systems with backend APIs, distributed systems, and automated infrastructure.
+  I focus heavily on reliability, security, and operational excellence.
+
+third_person_summary:
+  Calistus Igwilo is a Senior AI, Backend, and DevOps Engineer and Platform Architect
+  with expertise in building intelligent, scalable, and secure production systems.
+  He specializes in integrating agentic AI systems with backend platforms and
+  cloud-native infrastructure.
+
+core_focus:
+  - AI Systems & Agentic Architectures
+  - Python Backend & Distributed Systems
+  - DevOps & Cloud Infrastructure
+
+retrieval_priority: very_high

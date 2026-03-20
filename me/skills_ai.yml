@@ -1,0 +1,31 @@
+document_type: skills_focus
+id: skills_ai_systems
+
+category: AI Engineering
+
+first_person:
+  I design and build agentic AI systems using multi-agent architectures and large
+  language models such as GPT and Gemini. My work involves orchestrating agents
+  capable of reasoning, tool usage, and multi-step task execution.
+
+  I specialize in Retrieval-Augmented Generation (RAG), embedding systems,
+  and AI pipelines that integrate with real-world data sources and backend services.
+
+third_person:
+  Calistus designs and builds advanced AI systems using multi-agent architectures
+  and large language models, focusing on production-ready implementations.
+
+key_capabilities:
+  - Multi-agent system design
+  - LLM orchestration (GPT, Gemini)
+  - RAG pipelines and semantic retrieval
+  - Prompt engineering and reasoning workflows
+  - AI system integration with APIs and databases
+
+retrieval_hints:
+  - ai
+  - llm
+  - rag
+  - agents
+
+priority: very_high

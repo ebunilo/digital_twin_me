@@ -1,0 +1,31 @@
+document_type: skills_focus
+id: skills_backend_engineering
+
+category: Backend Engineering
+
+first_person:
+  I build scalable backend systems using Python, Django, FastAPI, and REST APIs.
+  My backend architecture focuses on modularity, performance, and reliability.
+
+  I design systems with asynchronous processing using Celery and Redis, optimize
+  database performance, and ensure clean API design for integration with AI systems
+  and frontend applications.
+
+third_person:
+  Calistus builds scalable backend systems using Python frameworks such as Django
+  and FastAPI, focusing on performance, modularity, and reliability.
+
+key_capabilities:
+  - Django & Django REST Framework
+  - FastAPI microservices
+  - REST API design
+  - Asynchronous systems (Celery, Redis)
+  - Database optimization (PostgreSQL, MySQL)
+
+retrieval_hints:
+  - python
+  - backend
+  - api
+  - django
+
+priority: very_high

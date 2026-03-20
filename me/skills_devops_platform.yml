@@ -1,0 +1,31 @@
+document_type: skills_focus
+id: skills_devops_platform
+
+category: DevOps & Platform Engineering
+
+first_person:
+  I design and operate cloud-native and on-premise platforms using Kubernetes,
+  Terraform, and Ansible. I specialize in Infrastructure as Code, CI/CD automation,
+  and secure system design.
+
+  I build production platforms with strong emphasis on scalability, observability,
+  and security, including IAM, network isolation, and threat modeling.
+
+third_person:
+  Calistus is a DevOps and platform engineer specializing in Kubernetes,
+  Infrastructure as Code, and secure, scalable system design.
+
+key_capabilities:
+  - Kubernetes (EKS, on-prem HA clusters)
+  - Terraform & infrastructure automation
+  - CI/CD pipelines (GitHub Actions, GitOps)
+  - Docker & container orchestration
+  - Security engineering (IAM, RBAC, network isolation)
+
+retrieval_hints:
+  - kubernetes
+  - devops
+  - terraform
+  - cloud
+
+priority: very_high

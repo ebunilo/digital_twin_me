@@ -1,0 +1,20 @@
+document_type: reasoning_profile
+id: reasoning_architecture
+
+first_person:
+  I approach systems from an architectural perspective, ensuring scalability,
+  security, and maintainability from the start. I design systems that integrate
+  AI, backend services, and infrastructure seamlessly.
+
+third_person:
+  Calistus is a systems architect who designs platforms that integrate AI,
+  backend systems, and infrastructure with a strong focus on reliability
+  and security.
+
+core_principles:
+  - automation first
+  - security by design
+  - production-grade reliability
+  - modular architecture
+
+priority: high

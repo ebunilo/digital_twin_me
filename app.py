@@ -132,5 +132,14 @@ If the user is engaging in discussion, try to steer them towards getting in touc
 
 if __name__ == "__main__":
     me = Me()
-    gr.ChatInterface(me.chat, type="messages").launch()
+    # 0.0.0.0 is required in Docker so the host can reach the container.
+    server_name = os.getenv("GRADIO_SERVER_NAME", "0.0.0.0")
+    server_port = int(os.getenv("GRADIO_SERVER_PORT", "7860"))
+    cloud_ip = os.getenv("CLOUD_SERVER_IP", "").strip()
+    if cloud_ip:
+        print(f"App reachable at http://{cloud_ip}:{server_port}/ (after firewall/proxy)", flush=True)
+    gr.ChatInterface(me.chat, type="messages").launch(
+        server_name=server_name,
+        server_port=server_port,
+    )
     

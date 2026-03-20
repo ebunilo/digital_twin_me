@@ -1,0 +1,22 @@
+document_type: education
+id: education_001
+priority: high
+
+first_person_summary: >
+  I hold an MSc in Bioengineering (Biomaterials and Biomechanics) from the
+  University of Nottingham, UK. I also hold a BTech in Biotechnology from the
+  Federal University of Technology, Owerri.  
+
+third_person_summary: >
+  Calistus Igwilo holds an MSc in Bioengineering (Biomaterials and Biomechanics)
+  from the University of Nottingham, UK and a BTech in Biotechnology from the
+  Federal University of Technology, Owerri.
+
+education:
+  - degree: MSc in Bioengineering
+    institution: University of Nottingham
+    date: 2012 - 2013
+    
+  - degree: BTech in Biotechnology
+    institution: Federal University of Technology, Owerri
+    date: 2005 - 2009
