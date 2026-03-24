@@ -1,0 +1,14 @@
+document_type: qa_pair
+id: qa_performance
+priority: high
+
+question: How do you optimize system performance?
+
+answer_first_person: >
+  I optimize performance by improving database queries, implementing caching,
+  and designing efficient asynchronous workflows. I also monitor system metrics
+  to identify bottlenecks.
+
+answer_third_person: >
+  Calistus optimizes system performance through database tuning, caching,
+  and efficient system design.

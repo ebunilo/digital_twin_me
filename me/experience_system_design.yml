@@ -1,0 +1,19 @@
+document_type: experience_scenario
+id: exp_system_design_001
+priority: very_high
+
+category: system_design
+
+first_person:
+  I design systems from the ground up, focusing on scalability, modularity, and
+  maintainability. I use microservices architecture, API-first design, and
+  distributed systems principles to build scalable platforms.
+
+third_person:
+  Calistus is experienced in designing scalable and modular systems using
+  distributed architecture principles.
+
+skills_demonstrated:
+  - system design
+  - microservices
+  - distributed systems

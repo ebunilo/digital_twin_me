@@ -40,16 +40,16 @@ The assistant is told to treat those documents as the **sole source of truth**, 
 
 ### Chat flow (`Me.chat`)
 
+`Me.chat` is a **generator**: Gradio’s **`ChatInterface`** treats it as a streaming handler and updates the assistant bubble as each prefix is yielded.
+
 Gradio passes `(message, history)`. History is normalized with **`Me._history_to_messages`**: either already OpenAI-style `{"role","content"}` dicts, or legacy **`[user, assistant]`** pairs per turn.
 
 1. Build `messages`: system prompt, prior turns, then the new user message.
 2. Loop:
-   - `openai.chat.completions.create` with **`gpt-4o-mini`**, `messages`, `tools`, **`parallel_tool_calls=False`**.
-   - On **`tool_calls`**, run **`handle_tool_call`** (module-level functions by name), append assistant message and tool results, repeat.
-   - Otherwise exit the loop.
+   - **`_stream_collect_one_completion`** calls `chat.completions.create(..., stream=True)` and reads the full stream for that round (tool-call deltas are merged by index before any JSON is parsed).
+   - On **`tool_calls`**, run **`handle_tool_call`**, append the assistant message (with `tool_calls`) and tool results to `messages`, then repeat. **No text is yielded** during these rounds (they are usually tool-only).
+   - On **`stop`** (or other non-tool finish), take the assembled assistant **`content`**, apply the **`_assistant_admits_missing_docs`** fallback if needed, then **`yield from _yield_stream_chunks`** so the reply appears progressively in the UI (the API response is buffered per round first so tool vs. text is unambiguous).
 3. **Fallback:** If the model never called **`record_unknown_question`** but the final assistant text looks like “no information in the profile” (see **`_assistant_admits_missing_docs`** heuristics), the app calls **`record_unknown_question(user_question)`** once so you still get a Pushover ping.
-
-The return value is **`final.content`** (the last assistant message content).
 
 ### OpenAI tools (function calling)
 

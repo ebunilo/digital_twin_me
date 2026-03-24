@@ -1,0 +1,14 @@
+document_type: qa_pair
+id: qa_backend_scaling
+priority: high
+
+question: How do you design scalable backend systems?
+
+answer_first_person: >
+  I design scalable backend systems using modular architecture, REST APIs, and
+  asynchronous processing with Celery and Redis. I also optimize database
+  performance and ensure systems are resilient under load.
+
+answer_third_person: >
+  Calistus designs scalable backend systems using modular architecture,
+  asynchronous processing, and optimized database design.

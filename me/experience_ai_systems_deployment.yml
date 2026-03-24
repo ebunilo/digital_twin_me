@@ -1,0 +1,19 @@
+document_type: experience_scenario
+id: exp_ai_production_001
+priority: very_high
+
+category: ai_systems
+
+first_person:
+  I specialize in taking AI systems from prototype to production by integrating
+  LLMs with backend services, APIs, and scalable infrastructure. I design systems
+  that handle real-world workloads with reliability and performance.
+
+third_person:
+  Calistus deploys production-grade AI systems by integrating LLMs with backend
+  and infrastructure layers.
+
+skills_demonstrated:
+  - AI deployment
+  - system integration
+  - backend + AI

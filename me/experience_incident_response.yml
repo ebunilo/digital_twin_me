@@ -1,0 +1,31 @@
+document_type: experience_scenario
+id: exp_incident_management_001
+priority: very_high
+
+category: incident_management
+
+first_person:
+  I have hands-on experience managing security incidents, including Business Email
+  Compromise (BEC) scenarios. I led the response by identifying compromised accounts,
+  securing affected systems, enforcing password resets, and implementing additional
+  protections such as MFA and email filtering policies.
+
+  I also worked on preventing future incidents by strengthening email authentication
+  (SPF, DKIM, DMARC) and deploying advanced threat protection systems.
+
+third_person:
+  Calistus has experience managing security incidents, including Business Email
+  Compromise cases, where he led incident response, remediation, and long-term
+  security improvements.
+
+skills_demonstrated:
+  - incident response
+  - security operations
+  - email security
+  - threat mitigation
+
+retrieval_hints:
+  - incident management
+  - incident response
+  - security incident
+  - breach

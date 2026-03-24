@@ -7,6 +7,7 @@ import os
 import requests
 import yaml
 from pathlib import Path
+from types import SimpleNamespace
 import gradio as gr
 
 
@@ -124,8 +125,93 @@ class Me:
             print(f"Tool called: {tool_name}", flush=True)
             tool = globals().get(tool_name)
             result = tool(**arguments) if tool else {}
-            results.append({"role": "tool","content": json.dumps(result),"tool_call_id": tool_call.id})
+            results.append(
+                {"role": "tool", "content": json.dumps(result), "tool_call_id": tool_call.id}
+            )
         return results
+
+    def _stream_collect_one_completion(self, messages: list):
+        """Consume one streamed completion; return (content, tool_calls_or_none, finish_reason)."""
+        stream = self.openai.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=messages,
+            tools=tools,
+            parallel_tool_calls=False,
+            stream=True,
+        )
+        content_parts: list[str] = []
+        tc_map: dict[int, dict[str, str]] = {}
+        finish_reason: str | None = None
+
+        for event in stream:
+            if not event.choices:
+                continue
+            choice = event.choices[0]
+            d = choice.delta
+            if d is not None and d.content:
+                content_parts.append(d.content)
+            if d is not None and d.tool_calls:
+                for tc in d.tool_calls:
+                    i = tc.index
+                    if i not in tc_map:
+                        tc_map[i] = {"id": "", "name": "", "arguments": ""}
+                    if tc.id:
+                        tc_map[i]["id"] = tc.id
+                    if tc.function:
+                        if tc.function.name:
+                            tc_map[i]["name"] = tc.function.name
+                        if tc.function.arguments:
+                            tc_map[i]["arguments"] += tc.function.arguments
+            if choice.finish_reason:
+                finish_reason = choice.finish_reason
+
+        content = "".join(content_parts)
+        tool_calls_list = None
+        if finish_reason == "tool_calls" and tc_map:
+            tool_calls_list = []
+            for i in sorted(tc_map.keys()):
+                row = tc_map[i]
+                tool_calls_list.append(
+                    SimpleNamespace(
+                        id=row["id"],
+                        function=SimpleNamespace(
+                            name=row["name"],
+                            arguments=row["arguments"],
+                        ),
+                    )
+                )
+        return content, tool_calls_list, finish_reason
+
+    @staticmethod
+    def _yield_stream_chunks(text: str):
+        """Progressive yields for Gradio (one user-visible assistant turn)."""
+        if not text:
+            yield ""
+            return
+        n = len(text)
+        step = max(12, min(48, n // 80 + 1))
+        pos = 0
+        while pos < n:
+            pos = min(n, pos + step)
+            yield text[:pos]
+
+    @staticmethod
+    def _assistant_message_for_tools(content: str, tool_calls) -> dict:
+        return {
+            "role": "assistant",
+            "content": content if content else None,
+            "tool_calls": [
+                {
+                    "id": tc.id,
+                    "type": "function",
+                    "function": {
+                        "name": tc.function.name,
+                        "arguments": tc.function.arguments,
+                    },
+                }
+                for tc in tool_calls
+            ],
+        }
     
     def system_prompt(self):
         system_prompt = f"You are acting as {self.name}. You are answering questions on {self.name}'s website, \
@@ -186,32 +272,35 @@ If the user is engaging in discussion, try to steer them towards getting in touc
     def chat(self, message, history):
         user_question = message
         prior = self._history_to_messages(history)
-        messages = [{"role": "system", "content": self.system_prompt()}] + prior + [{"role": "user", "content": message}]
-        done = False
+        messages = (
+            [{"role": "system", "content": self.system_prompt()}]
+            + prior
+            + [{"role": "user", "content": message}]
+        )
         recorded_unknown = False
-        while not done:
-            response = self.openai.chat.completions.create(
-                model="gpt-4o-mini",
-                messages=messages,
-                tools=tools,
-                parallel_tool_calls=False,
-            )
-            if response.choices[0].finish_reason == "tool_calls":
-                assistant_msg = response.choices[0].message
-                tool_calls = assistant_msg.tool_calls
-                for tc in tool_calls:
+
+        while True:
+            content, tool_calls_list, finish_reason = self._stream_collect_one_completion(messages)
+
+            if finish_reason == "tool_calls":
+                if not tool_calls_list:
+                    yield from self._yield_stream_chunks(
+                        content or "Sorry, the assistant could not complete that action. Please try again."
+                    )
+                    return
+                for tc in tool_calls_list:
                     if tc.function.name == "record_unknown_question":
                         recorded_unknown = True
-                results = self.handle_tool_call(tool_calls)
-                messages.append(assistant_msg)
+                results = self.handle_tool_call(tool_calls_list)
+                messages.append(self._assistant_message_for_tools(content, tool_calls_list))
                 messages.extend(results)
-            else:
-                done = True
-        final = response.choices[0].message
-        final_text = final.content or ""
-        if not recorded_unknown and final_text and self._assistant_admits_missing_docs(final_text):
-            record_unknown_question(user_question)
-        return final.content
+                continue
+
+            final_text = content or ""
+            if not recorded_unknown and final_text and self._assistant_admits_missing_docs(final_text):
+                record_unknown_question(user_question)
+            yield from self._yield_stream_chunks(final_text)
+            return
     
 
 if __name__ == "__main__":

@@ -1,0 +1,17 @@
+document_type: qa_pair
+id: qa_incident_advanced
+priority: very_high
+
+question: How do you handle incidents in production?
+
+answer_first_person: >
+  I follow a structured incident response process that includes detection,
+  containment, root cause analysis, and prevention. For example, I managed
+  a Business Email Compromise incident where I secured compromised accounts,
+  enforced password resets, and implemented MFA and email authentication
+  protocols such as SPF, DKIM, and DMARC.
+
+answer_third_person: >
+  Calistus follows a structured incident response approach, including detection,
+  containment, and prevention, and has handled real-world incidents such as
+  Business Email Compromise.

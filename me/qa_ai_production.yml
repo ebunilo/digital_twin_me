@@ -1,0 +1,14 @@
+document_type: qa_pair
+id: qa_ai_production
+priority: very_high
+
+question: Have you deployed AI systems to production?
+
+answer_first_person: >
+  Yes, I specialize in taking AI systems from prototype to production by integrating
+  LLMs with backend services and scalable infrastructure. I design systems that
+  handle real-world workloads reliably and efficiently.
+
+answer_third_person: >
+  Calistus has strong experience deploying AI systems into production environments,
+  integrating LLMs with backend and infrastructure layers.

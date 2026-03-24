@@ -1,0 +1,14 @@
+document_type: qa_pair
+id: qa_devops_kubernetes
+priority: very_high
+
+question: What is your experience with Kubernetes?
+
+answer_first_person: >
+  I have extensive experience with Kubernetes, including designing and deploying
+  both cloud-based and on-prem clusters. I work with RBAC, ingress controllers,
+  Helm, and high-availability configurations.
+
+answer_third_person: >
+  Calistus has extensive Kubernetes experience across both cloud and on-premise
+  environments, including high-availability and secure configurations.

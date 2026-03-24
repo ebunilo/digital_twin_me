@@ -1,0 +1,22 @@
+document_type: experience_scenario
+id: exp_sre_operations_001
+priority: high
+
+category: reliability
+
+first_person:
+  I design and operate production systems with a strong focus on reliability and
+  uptime. I implement health checks, monitoring, logging, and alerting to quickly
+  detect and resolve issues in distributed systems.
+
+  I also design systems with redundancy and fault tolerance to minimize downtime.
+
+third_person:
+  Calistus focuses on building reliable production systems with monitoring,
+  observability, and fault-tolerant architectures.
+
+skills_demonstrated:
+  - system reliability
+  - monitoring
+  - incident prevention
+  - observability

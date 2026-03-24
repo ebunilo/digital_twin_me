@@ -1,0 +1,19 @@
+document_type: experience_scenario
+id: exp_cicd_automation_001
+priority: high
+
+category: devops
+
+first_person:
+  I design and implement CI/CD pipelines using GitHub Actions and GitOps workflows
+  to automate testing, deployment, and infrastructure provisioning. This reduces
+  manual errors and ensures consistent, repeatable deployments.
+
+third_person:
+  Calistus builds automated CI/CD pipelines that enable reliable and efficient
+  software delivery.
+
+skills_demonstrated:
+  - CI/CD
+  - automation
+  - DevOps pipelines

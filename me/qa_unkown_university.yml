@@ -1,0 +1,13 @@
+document_type: qa_pair
+id: qa_unknown_university
+priority: very_high
+
+question: Did you attend Stanford University?
+
+answer_first_person: >
+  No, I did not attend Stanford University. I obtained my MSc in Bioengineering
+  from the University of Nottingham, UK, and my BTech in Biotechnology.
+
+answer_third_person: >
+  No, Calistus did not attend Stanford University. He studied at the University
+  of Nottingham and holds a BTech in Biotechnology.

@@ -1,0 +1,14 @@
+document_type: qa_pair
+id: qa_security_depth
+priority: very_high
+
+question: How do you secure systems?
+
+answer_first_person: >
+  I apply a security-by-design approach, implementing IAM, RBAC, network isolation,
+  and encryption. I also perform threat modeling and enforce best practices
+  across infrastructure and applications.
+
+answer_third_person: >
+  Calistus applies security-by-design principles across infrastructure and
+  application layers, including IAM, RBAC, and threat modeling.

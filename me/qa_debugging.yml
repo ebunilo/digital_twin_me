@@ -1,0 +1,14 @@
+document_type: qa_pair
+id: qa_debugging
+priority: high
+
+question: How do you troubleshoot production issues?
+
+answer_first_person: >
+  I approach troubleshooting systematically by analyzing logs, metrics, and system
+  behavior. I isolate the root cause, apply fixes, and implement preventive measures
+  to avoid recurrence.
+
+answer_third_person: >
+  Calistus uses a systematic approach to debugging, leveraging logs, metrics,
+  and root cause analysis.

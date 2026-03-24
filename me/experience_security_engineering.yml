@@ -1,0 +1,19 @@
+document_type: experience_scenario
+id: exp_security_engineering_001
+priority: very_high
+
+category: security
+
+first_person:
+  I design systems with security as a core requirement, implementing IAM,
+  RBAC, network isolation, and secure configurations. I also perform threat
+  modeling and apply best practices to protect infrastructure and applications.
+
+third_person:
+  Calistus applies security-by-design principles across infrastructure,
+  applications, and cloud environments.
+
+skills_demonstrated:
+  - security engineering
+  - IAM
+  - threat modeling
